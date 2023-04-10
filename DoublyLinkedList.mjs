@@ -1,13 +1,15 @@
 class Node {
-    constructor(data, next = null) {
+    constructor(data, next = null, prev = null) {
         this.data = data;
         this.next = next;
+        this.prev = prev;
     }
 }
 
-class LinkedList {
+class DoublyLinkedList {
     constructor() {
         this.head = null;
+        this.tail = null;
         this.count = 0;
     }
 
@@ -42,7 +44,16 @@ class LinkedList {
 
         if (index === 0) {
             newNode.next = this.head;
+
+            if (this.head !== null) {
+                this.head.prev = newNode;
+            }
+
             this.head = newNode;
+        } else if (index === this.count) {
+            newNode.next = null;
+            newNode.prev = this.tail;
+            this.tail.next = newNode;
         } else {
             let currentNode = this.head;
 
@@ -51,7 +62,13 @@ class LinkedList {
             }
 
             newNode.next = currentNode.next;
+            newNode.prev = currentNode;
             currentNode.next = newNode;
+            newNode.next.prev = newNode;
+        }
+
+        if (newNode.next === null) {
+            this.tail = newNode;
         }
         this.count++;
     }
@@ -66,7 +83,17 @@ class LinkedList {
         }
 
         if (index === 0) {
-            this.head = this.head.next;
+            const deletedNode = this.head;
+            if (this.head.next === null) {
+                this.head = null;
+                this.tail = null;
+            } else {
+                this.head = this.head.next;
+                this.head.prev = null;
+            }
+
+            this.count--;
+            return deletedNode;
         } else {
             let currentNode = this.head;
 
@@ -76,19 +103,29 @@ class LinkedList {
 
             const deletedNode = currentNode.next;
             currentNode.next = deletedNode.next;
+
+            if (currentNode.next === null) {
+                this.tail = currentNode;
+            } else {
+                currentNode.next.prev = currentNode;
+            }
+
+            this.count--;
+            return deletedNode;
         }
-        this.count--;
     }
 
     deleteLast() {
         if (this.count === 0) {
-            return this.deleteAt(this.count - 1);
+            throw new Error("count is over");
         }
+
+        return this.deleteAt(this.count - 1);
     }
 
     getNodeAt(index) {
         if (index >= this.count || index < 0) {
-            throw new Error('invalid index');
+            throw new Error('');
         }
 
         let currentNode = this.head;
@@ -101,4 +138,4 @@ class LinkedList {
     }
 }
 
-export { Node, LinkedList };
+export { Node, DoublyLinkedList };
